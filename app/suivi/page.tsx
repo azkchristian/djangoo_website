@@ -23,7 +23,7 @@ export default function SuiviPage() {
       // Appel à l'API pour récupérer les données de suivi
       const response = await fetch(`/api/colis?code=${trackingCode}`)
       if (!response.ok) {
-        throw new Error("Colis introuvable ou erreur serveur.")
+        throw new Error("Colis inexistant.")
       }
 
       const data = await response.json()

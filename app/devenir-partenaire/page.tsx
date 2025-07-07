@@ -86,26 +86,33 @@ export default function DevenirPartenairePage() {
     generateCaptcha()
   }, [])
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
 
-    if (!loginData.email || !loginData.password || !loginData.userType) {
-      alert("Veuillez remplir tous les champs")
-      return
-    }
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData),
+      })
 
-    // Simulation de connexion
-    if (loginData.userType === "point-relais") {
-      router.push("/point-relais")
-    } else if (loginData.userType === "livreur") {
-      router.push("/livreur")
+      if (!res.ok) {
+        const { error } = await res.json()
+        return alert(error || "Échec de la connexion")
+      }
+
+      const result = await res.json()
+      alert("Connexion réussie !")
+      router.push(`/${loginData.userType}`)
+    } catch (error) {
+      console.error("Erreur lors de la connexion :", error)
+      alert("Erreur serveur. Veuillez réessayer plus tard.")
     }
   }
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault()
 
-    // Validation des champs
     if (!signupData.acceptTerms) {
       alert("Veuillez accepter les conditions d'utilisation")
       return
@@ -121,14 +128,23 @@ export default function DevenirPartenairePage() {
       return
     }
 
-    // Simulation d'inscription
-    alert("Inscription réussie ! Votre compte sera activé sous 24h.")
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signupData),
+      })
 
-    // Redirection selon le type
-    if (signupData.userType === "point-relais") {
-      router.push("/point-relais")
-    } else if (signupData.userType === "livreur") {
-      router.push("/livreur")
+      if (!res.ok) {
+        const { error } = await res.json()
+        return alert(error || "Erreur lors de l'inscription")
+      }
+
+      alert("Inscription réussie !")
+      router.push(`/${signupData.userType}`)
+    } catch (error) {
+      console.error("Erreur lors de l'inscription :", error)
+      alert("Erreur serveur. Veuillez réessayer plus tard.")
     }
   }
 
